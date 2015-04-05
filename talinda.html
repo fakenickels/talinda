@@ -1,0 +1,49 @@
+<head>
+  <title>talinda</title>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Talinda da Verdade</h1>
+
+		{{> logicForm}}
+		{{> truthTable}}		
+	</div>
+</body>
+
+<template name="logicForm">
+	<form id="expForm">
+		<label>
+			Express
+			<input name="expression" class="form-control" id="exp" value="p -> (r E ~p)" type="text">
+		</label>
+		<button class="btn btn-primary" type="submit">Criar tabela</button>	
+	</form>
+</template>
+
+<template name="truthTable">
+	<h1>{{logicExp}}</h1>
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				{{#each propositions}}
+					<th>{{this}}</th>	
+				{{/each}}
+
+				{{#each subExpressions}}
+					<th>{{this}}</th>
+				{{/each}}
+			</tr>
+		</thead>
+		<tbody>
+			{{#each tableRows}}
+				<tr>
+					{{#each this}}
+					<td>{{this}}</td>
+					{{/each}}
+				</tr>
+			{{/each}}
+		</tbody>
+	</table>
+</template>
