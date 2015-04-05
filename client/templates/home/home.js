@@ -18,8 +18,8 @@ LogicExpression = {
 		onlyLetters: /[a-z]/g,
 		propositions: /~*[a-zFV]/g,
 		subExpressions: /~*\([^)]+\)/g,
-		operators: /E|OU|->|<->/g,
-		singleExpr: /\(?(~*[a-zFV])\s(E|OU|->|<->)\s(~*[a-zFV])\)?/g,
+		operators: /E|OU|->|<->|XOU/g,
+		singleExpr: /\(?(~*[a-zFV])\s(E|OU|->|<->|XOU)\s(~*[a-zFV])\)?/g,
 		singleWithParentheses: /~*\(.\)/g
 	},
 
@@ -31,6 +31,11 @@ LogicExpression = {
 
 		OU: function(p, q){
 			if(p == 'V' || q == 'V') return 'V';
+			else return 'F';
+		},
+
+		XOU: function(p, q){
+			if( p != q ) return 'V';
 			else return 'F';
 		},
 
