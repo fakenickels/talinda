@@ -4,7 +4,6 @@ Template.logicForm.events({
 
 		var exp = $('#exp').val();
 		LogicExpression.analyzeExpression(exp);
-		Session.set('logicExp', exp);
 	}
 });
 
@@ -18,44 +17,48 @@ LogicExpression = {
 		onlyLetters: /[a-z]/g,
 		propositions: /~*[a-zFV]/g,
 		subExpressions: /~*\([^)]+\)/g,
-		operators: /E|OU|->|<->|XOU/g,
-		singleExpr: /\(?(~*[a-zFV])\s(E|OU|->|<->|XOU)\s(~*[a-zFV])\)?/g,
+		operators: /E|OU|->|<->|XOU|~E|~OU/g,
+		singleExpr: /\(?(~*[a-zFV])\s(E|OU|->|<->|XOU|~E|~OU)\s(~*[a-zFV])\)?/g,
 		singleWithParentheses: /~*\(.\)/g
 	},
 
 	operators: {
 		E: function(p, q){
-			if(p == 'V' && q == 'V') return 'V';
-			else return 'F';
+			return (p == 'V' && q == 'V') ? 'V' : 'F';
 		},
 
 		OU: function(p, q){
-			if(p == 'V' || q == 'V') return 'V';
-			else return 'F';
+			return (p == 'V' || q == 'V') ? 'V' : 'F';
 		},
 
 		XOU: function(p, q){
-			if( p != q ) return 'V';
-			else return 'F';
+			return (p != q) ? 'V' : 'F';
 		},
 
-		'~': function(p, q){
+		'~': function(p){
 			if(p == 'V') return 'F';
 			else if(p == 'F') return 'V';
 		},
 
 		'->': function(p, q){
-			if( p == 'V' && q == 'F') return 'F';
-			else return 'V';
+			return (p == 'V' && q == 'F') ? 'F' : 'V';
 		},
 
 		'<->': function(p, q){
 			if( (p == 'V' && q == 'V') || (p == 'F' && q == 'F')) return 'V';
 			else return 'F';
+		},
+
+		'~E': function(p, q){
+			return (p == 'F' && q == 'F') ? 'V' : 'F';
+		},
+
+		'~OU': function(p, q){
+			return (p == 'F' || q == 'F') ? 'V' : 'F';
 		}
 	},
 
-	exp: '',
+	exp: Blaze.ReactiveVar(''),
 
 	evalSingleExpr: function(expression, propositionsVals){
 		var operators = expression.match(LogicExpression.regexps.operators),
@@ -111,7 +114,7 @@ LogicExpression = {
 	},
 
 	analyzeExpression: function(exp){
-		this.exp = exp;
+		this.exp.set(exp);
 		this.setPropositions(exp);
 		this.setSubExpressions(exp);
 
@@ -181,7 +184,7 @@ LogicExpression = {
 
 Template.truthTable.helpers({
 	logicExp: function(){
-		return Session.get('logicExp');
+		return LogicExpression.exp.get();
 	},
 
 	propositions: function(){
