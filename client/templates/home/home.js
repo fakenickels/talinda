@@ -72,8 +72,6 @@ LogicExpression = {
 			});
 		}
 
-		console.log(expression, propositionsVals);
-
 		_.each(props, function(proposition){
 			if(_.contains(proposition, '~')){
 				proposition = proposition.replace('~', '');
@@ -89,14 +87,11 @@ LogicExpression = {
 			}
 		});
 
-		console.log(propositionsVals);
-
 		if(operators){
 			var operator = operators[0];
 
 			var propositions = expression.split(operators);
 			if(propositions.length > 1)	{
-				console.log(operator, _.values(propsToUse));
 				return LogicExpression.operators[operator].apply(this, _.values(propsToUse));
 			}
 		} else return Error("Can't evaluate the expression.");
