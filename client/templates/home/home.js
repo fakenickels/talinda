@@ -45,8 +45,7 @@ LogicExpression = {
 		},
 
 		'<->': function(p, q){
-			if( (p == 'V' && q == 'V') || (p == 'F' && q == 'F')) return 'V';
-			else return 'F';
+			return (p == q) ? 'V' : 'F';
 		},
 
 		'~E': function(p, q){
@@ -80,18 +79,24 @@ LogicExpression = {
 				proposition = proposition.replace('~', '');
 				propsToUse[proposition] = LogicExpression.operators['~'](propositionsVals[proposition])
 				console.log('~ detected for', proposition);
-				console.log(propsToUse[proposition]);
 			} else {
+				if(_.contains(propsToUse, proposition)){
+					// Forgive me
+					propsToUse[proposition+proposition] = propositionsVals[proposition];
+				}
+
 				propsToUse[proposition] = propositionsVals[proposition];
 			}
 		});
+
+		console.log(propositionsVals);
 
 		if(operators){
 			var operator = operators[0];
 
 			var propositions = expression.split(operators);
-			console.log('propositions', propositions)
-			if(propositions.length > 1){
+			if(propositions.length > 1)	{
+				console.log(operator, _.values(propsToUse));
 				return LogicExpression.operators[operator].apply(this, _.values(propsToUse));
 			}
 		} else return Error("Can't evaluate the expression.");
@@ -142,7 +147,6 @@ LogicExpression = {
 
 	setCondition: function(results){
 		var condition;
-		console.log('results', results);
 		if( _.contains(results, 'F') && _.contains(results, 'V')){
 			condition = 'Contingência';
 		} else if(!_.contains(results, 'F')){
