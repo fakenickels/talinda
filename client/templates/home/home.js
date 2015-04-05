@@ -59,6 +59,7 @@ LogicExpression = {
 	},
 
 	exp: Blaze.ReactiveVar(''),
+	condition: Blaze.ReactiveVar(''),
 
 	evalSingleExpr: function(expression, propositionsVals){
 		var operators = expression.match(LogicExpression.regexps.operators),
@@ -129,7 +130,7 @@ LogicExpression = {
 			return letter;
 		});
 
-		return LogicExpression.propositions.set(letters);
+		return LogicExpression.propositions.set(letters.sort());
 	},
 
 	setSubExpressions: function(exp){
@@ -139,16 +140,31 @@ LogicExpression = {
 		return LogicExpression.subExpressions.set(subexps);
 	},
 
+	setCondition: function(results){
+		var condition;
+		console.log('results', results);
+		if( _.contains(results, 'F') && _.contains(results, 'V')){
+			condition = 'Contingência';
+		} else if(!_.contains(results, 'F')){
+			condition = 'Tautologia'; 
+		} else if(!_.contains(results, 'V')){
+			condition = 'Contradição';
+		}
+
+		LogicExpression.condition.set(condition);
+	},
+
 	makeRows: function(){
 		var rowsLength = Math.pow(2, LogicExpression.propositions.get().length),
 			propositionsRows = {},
 			propositionsLastVal = {},
-			rows = [];
+			rows = [],
+			results = [];
 
 		var propositions = LogicExpression.propositions.get(),
 			subExpressions = LogicExpression.subExpressions.get();
 
-		// Creating the range TRUE or FALSE for propositions
+		// Creating the range TRUE or FALSE for propositions		
 		_.each(propositions, function(proposition, i){
 			i+=1;
 			var rate = rowsLength/Math.pow(2, i);
@@ -172,12 +188,18 @@ LogicExpression = {
 			});
 
 			_.each(subExpressions, function(subExpressions){
-				row.push(LogicExpression.evalAllExpr(subExpressions, propositionsLastVal));
+				var r = LogicExpression.evalAllExpr(subExpressions, propositionsLastVal);
+				row.push(r);
 			});
 
 			rows.push(row);
 		});
+		
+		_.each(rows, function(row){
+			results.push( _.last(row) );
+		});
 
+		LogicExpression.setCondition(results);
 		return LogicExpression.tableRows.set(rows);
 	}
 }
@@ -197,5 +219,9 @@ Template.truthTable.helpers({
 
 	tableRows: function(){
 		return LogicExpression.tableRows.get();
+	},
+
+	condition: function(){
+		return LogicExpression.condition.get();
 	}
 });

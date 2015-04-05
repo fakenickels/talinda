@@ -15,7 +15,7 @@
 	<form id="expForm">
 		<label>
 			Expressão
-			<input name="expression" class="form-control" id="exp" value="p -> (r E ~p)" type="text">
+			<input name="expression" class="form-control" id="exp" value="p -> (p -> ~r) <-> q OU r" type="text">
 		</label>
 		<button class="btn btn-primary" type="submit">Criar tabela</button>	
 	</form>
@@ -23,7 +23,7 @@
 
 <template name="truthTable">
 	<h1>{{logicExp}}</h1>
-
+	<p class="lead">{{condition}}</p>
 	<table class="table table-striped">
 		<thead>
 			<tr>
